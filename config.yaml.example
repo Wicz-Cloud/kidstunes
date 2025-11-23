@@ -1,0 +1,31 @@
+discord:
+  token: "YOUR_BOT_TOKEN"
+  request_channel_id: 123456789  # Channel where users make requests
+  approval_channel_id: 987654321  # Channel where admins approve
+  admin_role_id: 111222333  # Role required to approve/reject
+
+paths:
+  output_dir: "/var/lib/plexmediaserver/Music/plex_music"
+  database: "/home/bill/music_kids/kidstunes.db"
+  temp_dir: "/tmp/kidstunes"
+
+ytdlp:
+  audio_format: "mp3"
+  audio_quality: "192"
+  search_prefix: "ytsearch1:"  # Search YouTube, return 1 result
+
+xai:
+  api_key: "YOUR_XAI_API_KEY"
+  model: "grok-4-1-fast-non-reasoning"
+
+beets:
+  enabled: true  # Enable beets processing for metadata cleaning
+  library_path: "/home/bill/music_kids/beets_library.db"  # Beets library database
+  music_directory: "/var/lib/plexmediaserver/Music/plex_music"  # Directory to import into beets
+  import_config:
+    autotag: true  # Automatically tag files
+    quiet_fallback: "asis"  # What to do when no match found
+    timid: false  # Don't ask for confirmation
+    group_albums: false  # Don't group albums
+    singletons: true  # Allow single tracks
+    search_ids: []  # MusicBrainz release IDs to search

@@ -1,0 +1,87 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kidstunes"
+version = "1.0.0"
+description = "A Discord-based music acquisition system for Plex with approval workflow"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Communications :: Chat",
+]
+dependencies = [
+    "discord.py>=2.3.0",
+    "yt-dlp>=2024.0.0",
+    "aiosqlite>=0.19.0",
+    "PyYAML>=6.0",
+    "requests>=2.25.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/woczcloud/kidstunes"
+Repository = "https://github.com/woczcloud/kidstunes"
+Issues = "https://github.com/woczcloud/kidstunes/issues"
+Documentation = "https://github.com/woczcloud/kidstunes#readme"
+
+[project.scripts]
+kidstunes = "kidstunes.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kidstunes*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "yt_dlp.*",
+]
+ignore_missing_imports = true
