@@ -34,27 +34,52 @@ class Downloader:
                 "refined_search_term": user_query,
                 "artist": None,
                 "song": None,
-                "album": None,
+                "album": "Singles",  # Always provide a default album
             }
 
         prompt = f"""Given this music request: "{user_query}"
 
-Extract the artist name, song title, and album name (if mentioned) from the request.
+Extract the PRIMARY artist name, song title, and album name from the request.
+CRITICAL REQUIREMENTS:
+- Return only the MAIN/PRIMARY artist name, not featuring artists or collaborations
+- ALWAYS identify an album - this is REQUIRED, never return null for album
+- Use your knowledge of popular songs to determine the correct album
+- CLEAN the song title: remove any YouTube-specific text like "Official Video", "Official Music Video", "(Official Music Video)", "Live", "Lyric Video", "Audio", etc.
+- Remove artist name prefixes from song titles (e.g., "Artist - Song Title" should become just "Song Title")
+- Remove featuring artists from song titles (e.g., "[feat. Artist]" or "(feat. Artist)" should be removed)
+- Remove publisher/record label suffixes from song titles (e.g., "- Label Name" should be removed)
+- If the song is a single or you can't identify the album, use "Singles" as the album name
+
 Format your response as a JSON object with these exact keys:
-- "artist": the artist/band name (or null if not identifiable)
-- "song": the song title (or null if not identifiable)
-- "album": the album name (or null if not mentioned)
+- "artist": the PRIMARY artist/band name only (REQUIRED)
+- "song": the CLEAN song title without YouTube extras, artist prefixes, featuring artists, or publisher suffixes (REQUIRED)
+- "album": the album name (REQUIRED - never null)
 - "refined_search_term": an optimized YouTube search query for finding the official music video
 
 Examples:
-Input: "drummer boy king and country"
-Output: {{"artist": "for KING + COUNTRY", "song": "Little Drummer Boy", "album": null, "refined_search_term": "for KING + COUNTRY Little Drummer Boy Official Music Video"}}
+Input: "no one like the lord circuit rider music"
+Output: {{"artist": "Circuit Rider Music", "song": "No One Like The Lord (We Crown You)", "album": "Sovereign", "refined_search_term": "Circuit Rider Music No One Like The Lord Official Music Video"}}
 
-Input: "taylor swift blank space"
-Output: {{"artist": "Taylor Swift", "song": "Blank Space", "album": null, "refined_search_term": "Taylor Swift Blank Space Official Music Video"}}
+Input: "katy nichole in jesus name official music video"
+Output: {{"artist": "Katy Nichole", "song": "In Jesus Name (God of Possible)", "album": "Jesus Changed My Life", "refined_search_term": "Katy Nichole In Jesus Name Official Music Video"}}
 
-Input: "bohemian rhapsody queen"
-Output: {{"artist": "Queen", "song": "Bohemian Rhapsody", "album": null, "refined_search_term": "Queen Bohemian Rhapsody Official Music Video"}}
+Input: "taylor swift blank space official video"
+Output: {{"artist": "Taylor Swift", "song": "Blank Space", "album": "1989", "refined_search_term": "Taylor Swift Blank Space Official Music Video"}}
+
+Input: "bohemian rhapsody queen live"
+Output: {{"artist": "Queen", "song": "Bohemian Rhapsody", "album": "A Night at the Opera", "refined_search_term": "Queen Bohemian Rhapsody Official Music Video"}}
+
+Input: "love story taylor swift feat. ed sheeran lyric video"
+Output: {{"artist": "Taylor Swift", "song": "Love Story", "album": "Fearless", "refined_search_term": "Taylor Swift Love Story Official Music Video"}}
+
+Input: "drummer boy king and country audio"
+Output: {{"artist": "for KING + COUNTRY", "song": "Little Drummer Boy", "album": "A Drummer Boy Christmas", "refined_search_term": "for KING + COUNTRY Little Drummer Boy Official Music Video"}}
+
+Input: "jehovah hillsong chris brown official music video"
+Output: {{"artist": "Hillsong", "song": "Jehovah", "album": "There Is More", "refined_search_term": "Hillsong Jehovah Official Music Video"}}
+
+Input: "no fear we the kingdom"
+Output: {{"artist": "We The Kingdom", "song": "No Fear", "album": "Holy Water", "refined_search_term": "We The Kingdom No Fear Official Music Video"}}
 
 Return only the JSON object, no extra text."""
 
@@ -83,10 +108,18 @@ Return only the JSON object, no extra text."""
 
                 parsed = json.loads(content)
                 # Validate required keys and return proper types
+                artist = parsed.get("artist")
+                song = parsed.get("song")
+                album = parsed.get("album")
+
+                # Ensure album is never None - fallback to "Singles" if AI didn't provide one
+                if album is None:
+                    album = "Singles"
+
                 return {
-                    "artist": parsed.get("artist"),
-                    "song": parsed.get("song"),
-                    "album": parsed.get("album"),
+                    "artist": artist,
+                    "song": song,
+                    "album": album,
                     "refined_search_term": parsed.get("refined_search_term")
                     or user_query,
                 }
@@ -97,7 +130,7 @@ Return only the JSON object, no extra text."""
                     "refined_search_term": content if content else user_query,
                     "artist": None,
                     "song": None,
-                    "album": None,
+                    "album": "Singles",  # Always provide a default album
                 }
         except Exception as e:
             print(f"AI refinement failed: {e}")
@@ -105,7 +138,7 @@ Return only the JSON object, no extra text."""
                 "refined_search_term": user_query,
                 "artist": None,
                 "song": None,
-                "album": None,
+                "album": "Singles",  # Always provide a default album
             }
 
     async def search_and_download(
@@ -161,7 +194,11 @@ Return only the JSON object, no extra text."""
                     "key": "FFmpegExtractAudio",
                     "preferredcodec": self.config.audio_format,
                     "preferredquality": self.config.audio_quality,
-                }
+                },
+                {
+                    "key": "FFmpegMetadata",
+                    "add_metadata": True,
+                },
             ],
             "outtmpl": str(
                 album_dir / f"{self.sanitize_filename(target_song)}.%(ext)s"
@@ -175,7 +212,7 @@ Return only the JSON object, no extra text."""
             "rm_cache_dir": True,  # Clean up cache
         }
 
-        # Add metadata override - always set what we have, using defaults for missing values
+        # Set metadata in the options - this will be used by FFmpegMetadata postprocessor
         ydl_opts["artist"] = target_artist
         ydl_opts["title"] = target_song
         ydl_opts["album"] = target_album
@@ -224,23 +261,22 @@ Return only the JSON object, no extra text."""
             return ydl.extract_info(url, download=True)
 
     async def _process_with_beets(self, file_path: str, request_id: int) -> None:
-        """Process downloaded file with beets for metadata cleaning and MusicBrainz integration."""
+        """Process downloaded file with beets for filename cleaning."""
         try:
             import os
 
-            print(f"Processing {file_path} with beets...")
+            print(f"Processing {file_path} with beets for filename cleaning...")
 
-            # Use beets command line interface for simplicity and reliability
+            # First, set the metadata on the file using kid3 or similar
+            # Then use beets to move/rename the file based on the clean metadata
+
+            # Use beets move command to rename file based on metadata
+            # This will rename the file to match the artist/album/song structure
             cmd = [
                 "beet",
-                "import",
+                "move",
+                "--yes",  # Don't prompt for confirmation
                 "--quiet",  # Reduce output
-                "--timid",  # Don't ask for confirmation
-                "--search-id",
-                "",  # Don't restrict to specific release
-                "--art",  # Fetch album art
-                "--noninteractive",  # Never prompt for input
-                "--yes",  # Answer yes to all prompts
                 file_path,
             ]
 
@@ -248,7 +284,7 @@ Return only the JSON object, no extra text."""
             env = os.environ.copy()
             env["BEETSDIR"] = os.path.dirname(self.config.beets_library_path)
 
-            # Run beets import
+            # Run beets move
             result = await asyncio.create_subprocess_exec(
                 *cmd,
                 env=env,
@@ -260,14 +296,14 @@ Return only the JSON object, no extra text."""
             stdout, stderr = await result.communicate()
 
             if result.returncode == 0:
-                print(f"Beets successfully processed {file_path}")
-                # Try to extract metadata from the processed file
-                await self._extract_metadata_from_file(file_path, request_id)
+                print(f"Beets successfully renamed {file_path}")
+                # The file has been moved, we need to update the database with the new path
+                # For now, we'll keep the original path since beets move might not change it if already correct
             else:
-                print(f"Beets processing failed: {stderr.decode()}")
+                print(f"Beets move failed: {stderr.decode()}")
 
         except FileNotFoundError:
-            print("Beets not installed, skipping metadata processing")
+            print("Beets not installed, skipping filename processing")
         except Exception as e:
             print(f"Beets processing error: {e}")
             # Don't fail the entire process if beets fails

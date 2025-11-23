@@ -8,15 +8,17 @@ A Discord-based music acquisition system for Plex that allows family members to 
 
 ## ✨ Features
 
-- 🤖 **AI-Powered Search**: Uses x.ai Grok to intelligently refine music search queries
+- 🤖 **AI-Powered Search**: Uses x.ai Grok to intelligently refine music search queries and extract clean metadata
 - 🎵 **Discord Integration**: Simple `!request` command with admin approval workflow
 - 📥 **Automatic Downloads**: yt-dlp integration for high-quality audio extraction
-- 🏷️ **Smart Metadata**: Beets integration with MusicBrainz for accurate tagging
-- 📁 **Plex Ready**: Proper Artist/Album structure for seamless Plex integration
+- 🏷️ **Smart Metadata**: Automatic metadata embedding with clean artist, album, and song titles
+- 📁 **Album Organization**: Always identifies albums using AI knowledge for proper Plex library structure
+- 🎵 **Song Title Cleaning**: Removes YouTube extras, featuring artists, and publisher suffixes for clean filenames
 - 🔄 **Approval Workflow**: Admins approve/reject requests with reactions
 - 📊 **Status Tracking**: Real-time status updates on original request messages
 - 🛡️ **Robust Error Handling**: Automatic cleanup and recovery from failures
 - 🔧 **Systemd Service**: Production-ready deployment with automatic restarts
+- 🎼 **Beets Integration**: Optional advanced metadata processing and filename standardization
 
 ## 📋 Prerequisites
 

@@ -100,7 +100,7 @@ class Database:
         result = cursor.lastrowid
         if result is None:
             raise RuntimeError("Failed to get last row ID")
-        return result
+        return int(result)
 
     async def update_request(self, request_id: int, **kwargs: Any) -> None:
         if not kwargs:
