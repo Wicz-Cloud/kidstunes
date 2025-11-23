@@ -26,7 +26,7 @@ If applicable, add screenshots to help explain your problem.
 **Environment:**
  - OS: [e.g. Ubuntu 22.04]
  - Python Version: [e.g. 3.11]
- - KidsTunes Version: [e.g. 1.0.0]
+ - Commit/Branch: [e.g. master, commit hash]
 
 **Additional context**
 Add any other context about the problem here, such as:

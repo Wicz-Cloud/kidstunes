@@ -15,7 +15,7 @@ This project follows a code of conduct to ensure a welcoming environment for all
 
 ### Reporting Bugs
 
-1. Check the [Issues](https://github.com/woczcloud/kidstunes/issues) page to see if the bug has already been reported
+1. Check the [Issues](https://github.com/Wicz-Cloud/kidstunes/issues) page to see if the bug has already been reported
 2. If not, create a new issue with:
    - A clear title describing the bug
    - Steps to reproduce the issue
@@ -49,7 +49,7 @@ This project follows a code of conduct to ensure a welcoming environment for all
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/woczcloud/kidstunes.git
+   git clone https://github.com/Wicz-Cloud/kidstunes.git
    cd kidstunes
    ```
 

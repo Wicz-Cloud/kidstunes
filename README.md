@@ -32,7 +32,7 @@ A Discord-based music acquisition system for Plex that allows family members to 
 ### 1. Clone and Install
 
 ```bash
-git clone https://github.com/woczcloud/kidstunes.git
+git clone https://github.com/Wicz-Cloud/kidstunes.git
 cd kidstunes
 python3 -m venv ../venv
 source ../venv/bin/activate
@@ -169,7 +169,7 @@ kidstunes/
 ### Setup Development Environment
 
 ```bash
-git clone https://github.com/woczcloud/kidstunes.git
+git clone https://github.com/Wicz-Cloud/kidstunes.git
 cd kidstunes
 python3 -m venv ../venv
 source ../venv/bin/activate

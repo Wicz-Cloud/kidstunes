@@ -30,10 +30,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/woczcloud/kidstunes"
-Repository = "https://github.com/woczcloud/kidstunes"
-Issues = "https://github.com/woczcloud/kidstunes/issues"
-Documentation = "https://github.com/woczcloud/kidstunes#readme"
+Homepage = "https://github.com/Wicz-Cloud/kidstunes"
+Repository = "https://github.com/Wicz-Cloud/kidstunes"
+Issues = "https://github.com/Wicz-Cloud/kidstunes/issues"
+Documentation = "https://github.com/Wicz-Cloud/kidstunes#readme"
 
 [project.scripts]
 kidstunes = "kidstunes.main:main"
