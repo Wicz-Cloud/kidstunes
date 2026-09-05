@@ -19,8 +19,7 @@ class Database:
         await self.conn.close()
 
     async def create_tables(self) -> None:
-        await self.conn.execute(
-            """
+        await self.conn.execute("""
             CREATE TABLE IF NOT EXISTS requests (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 discord_user_id TEXT NOT NULL,
@@ -39,8 +38,7 @@ class Database:
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                 updated_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
-        """
-        )
+        """)
         # Add columns if they don't exist (for existing databases)
         try:
             await self.conn.execute(
@@ -156,12 +154,12 @@ class Database:
             youtube_title=row[11] if len(row) > 11 else None,
             file_path=row[12] if len(row) > 12 else None,
             error_message=row[13] if len(row) > 13 else None,
-            created_at=datetime.fromisoformat(row[14])
-            if len(row) > 14 and row[14]
-            else None,
-            updated_at=datetime.fromisoformat(row[15])
-            if len(row) > 15 and row[15]
-            else None,
+            created_at=(
+                datetime.fromisoformat(row[14]) if len(row) > 14 and row[14] else None
+            ),
+            updated_at=(
+                datetime.fromisoformat(row[15]) if len(row) > 15 and row[15] else None
+            ),
             original_message_id=row[16] if len(row) > 16 else None,
             original_channel_id=row[17] if len(row) > 17 else None,
         )
