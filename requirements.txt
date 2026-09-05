@@ -4,4 +4,4 @@ aiosqlite>=0.19.0
 pyyaml>=6.0
 requests>=2.25.0
 beets>=1.6.0
-mutagen>=1.45.0
+mutagen>=1.48.1
