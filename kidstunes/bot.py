@@ -141,7 +141,7 @@ class RequestCog(commands.Cog):
                         int(req.original_channel_id)
                     )
                     if original_channel:
-                        original_message = await original_channel.fetch_message(
+                        original_message = await original_channel.fetch_message(  # type: ignore[union-attr]
                             int(req.original_message_id)
                         )
                         await original_message.add_reaction("✅")
@@ -176,7 +176,7 @@ class RequestCog(commands.Cog):
                         int(req.original_channel_id)
                     )
                     if original_channel:
-                        original_message = await original_channel.fetch_message(
+                        original_message = await original_channel.fetch_message(  # type: ignore[union-attr]
                             int(req.original_message_id)
                         )
                         await original_message.add_reaction("❌")
