@@ -1,4 +1,5 @@
 """Tests for the downloader module."""
+
 import pytest
 
 from kidstunes.config import Config
@@ -12,8 +13,7 @@ class TestDownloader:
     def config(self, tmp_path):
         """Create a test config."""
         config_file = tmp_path / "test_config.yaml"
-        config_file.write_text(
-            """
+        config_file.write_text("""
 discord:
   token: "test_token"
   request_channel_id: 123
@@ -33,8 +33,7 @@ ytdlp:
 xai:
   api_key: ""
   model: "test-model"
-"""
-        )
+""")
         return Config(str(config_file))
 
     @pytest.fixture
