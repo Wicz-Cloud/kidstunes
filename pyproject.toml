@@ -86,3 +86,14 @@ module = [
     "yaml",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "numpy",
+    "numpy.*",
+    "beets",
+    "beets.*",
+]
+follow_imports = "skip"
+ignore_missing_imports = true
+
